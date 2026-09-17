@@ -1,0 +1,13 @@
+{
+  "name": "cpp51-compiler",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Educational C++ subset compiler targeting Intel 8051 assembly.",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

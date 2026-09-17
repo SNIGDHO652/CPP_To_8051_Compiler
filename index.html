@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="Educational C++ subset compiler targeting Intel 8051 assembly."
+    >
+    <title>C++51 Compiler</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+<main class="app">
+    <section class="hero">
+        <div class="eyebrow">Compiler Engineering Project</div>
+
+        <h1>C++51 Compiler</h1>
+
+        <p class="subtitle">
+            A browser-based compiler that translates a documented 8-bit
+            subset of C++ into Intel 8051 assembly. Inspect every compiler
+            phase: tokens, AST, symbol table, diagnostics and final assembly.
+        </p>
+
+        <div class="badges">
+            <span class="badge">Lexer</span>
+            <span class="badge">Recursive-Descent Parser</span>
+            <span class="badge">AST</span>
+            <span class="badge">Semantic Analysis</span>
+            <span class="badge">Constant Folding</span>
+            <span class="badge">8051 Code Generation</span>
+        </div>
+    </section>
+
+    <section class="compiler-layout">
+        <article class="panel">
+            <header class="panel-header">
+                <div class="panel-title">C++ Source</div>
+
+                <div class="toolbar">
+                    <button id="exampleButton" class="button">Example</button>
+                    <button id="clearButton" class="button">Clear</button>
+                    <button id="compileButton" class="button primary">
+                        Compile
+                    </button>
+                </div>
+            </header>
+
+            <textarea
+                id="sourceEditor"
+                class="editor"
+                spellcheck="false"
+                aria-label="C++ source editor"
+            ></textarea>
+        </article>
+
+        <article class="panel">
+            <header class="panel-header">
+                <div class="panel-title">Compiler Output</div>
+
+                <div class="toolbar">
+                    <button id="copyButton" class="button">Copy ASM</button>
+                    <button id="downloadButton" class="button">
+                        Download .asm
+                    </button>
+                </div>
+            </header>
+
+            <nav class="tabs" aria-label="Compiler output views">
+                <button class="tab-button active" data-tab="assembly">
+                    Assembly
+                </button>
+                <button class="tab-button" data-tab="ast">AST</button>
+                <button class="tab-button" data-tab="tokens">Tokens</button>
+                <button class="tab-button" data-tab="symbols">Symbols</button>
+                <button class="tab-button" data-tab="diagnostics">
+                    Diagnostics
+                </button>
+            </nav>
+
+            <section id="assemblyTab" class="tab-content active">
+                <pre id="assemblyOutput"></pre>
+            </section>
+
+            <section id="astTab" class="tab-content">
+                <pre id="astOutput"></pre>
+            </section>
+
+            <section id="tokensTab" class="tab-content">
+                <pre id="tokensOutput"></pre>
+            </section>
+
+            <section id="symbolsTab" class="tab-content">
+                <pre id="symbolsOutput"></pre>
+            </section>
+
+            <section id="diagnosticsTab" class="tab-content">
+                <pre id="diagnosticsOutput"></pre>
+            </section>
+        </article>
+    </section>
+
+    <section class="stats">
+        <article class="stat">
+            <span id="lineCount" class="stat-value">0</span>
+            <span class="stat-label">Source lines</span>
+        </article>
+
+        <article class="stat">
+            <span id="tokenCount" class="stat-value">0</span>
+            <span class="stat-label">Tokens</span>
+        </article>
+
+        <article class="stat">
+            <span id="variableCount" class="stat-value">0</span>
+            <span class="stat-label">Variables</span>
+        </article>
+
+        <article class="stat">
+            <span id="instructionCount" class="stat-value">0</span>
+            <span class="stat-label">Instructions</span>
+        </article>
+
+        <article class="stat">
+            <span id="stackDepth" class="stat-value">0</span>
+            <span class="stat-label">Expression stack</span>
+        </article>
+    </section>
+
+    <div id="status" class="status" aria-live="polite"></div>
+
+    <section class="docs">
+        <article class="doc-card">
+            <h2>Supported C++ subset</h2>
+            <ul>
+                <li><code>int main()</code></li>
+                <li><code>uint8_t</code> and <code>unsigned char</code></li>
+                <li>Assignments and <code>++</code>/<code>--</code></li>
+                <li><code>if</code>/<code>else</code> and <code>while</code></li>
+                <li><code>break</code>, <code>continue</code>, <code>return</code></li>
+                <li>Arithmetic, bitwise, comparison and logical operators</li>
+                <li>Direct <code>P0</code>-<code>P3</code> access</li>
+            </ul>
+        </article>
+
+        <article class="doc-card">
+            <h2>Target model</h2>
+            <p>
+                Variables use internal RAM <code>30H-6FH</code>.
+                The generated program initializes <code>SP=6FH</code>,
+                leaving <code>70H-7FH</code> for temporary expression values.
+            </p>
+            <p>
+                Values are unsigned 8-bit integers. Arithmetic wraps modulo
+                256. Full C++ features such as classes, pointers, templates,
+                arrays, exceptions, STL and user-defined functions are
+                intentionally outside the project scope.
+            </p>
+        </article>
+    </section>
+</main>
+
+<script type="module" src="./src/ui.js"></script>
+</body>
+</html>
