@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="Educational C++ subset compiler targeting Intel 8051 assembly with IR, dependency analysis and a Tomasulo simulator."
+    >
+    <title>C++51 Compiler + Tomasulo Lab</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+<main class="app">
+    <section class="hero">
+        <div class="eyebrow">Compiler + Computer Architecture Project</div>
+
+        <h1>C++51 Compiler + Tomasulo Lab</h1>
+
+        <p class="subtitle">
+            Compile a documented 8-bit C++ subset to Intel 8051 assembly,
+            then inspect three-address IR, RAW/WAR/WAW dependencies, a safe
+            static schedule and a cycle-by-cycle Tomasulo simulation.
+        </p>
+
+        <div class="badges">
+            <span class="badge">Lexer</span>
+            <span class="badge">Recursive-Descent Parser</span>
+            <span class="badge">AST</span>
+            <span class="badge">Semantic Analysis</span>
+            <span class="badge">Constant Folding</span>
+            <span class="badge">Three-Address IR</span>
+            <span class="badge">Dependency DAG</span>
+            <span class="badge">Tomasulo Simulation</span>
+            <span class="badge">Static Scheduling</span>
+            <span class="badge">8051 Code Generation</span>
+        </div>
+    </section>
+
+    <section class="notice">
+        <strong>Architecture note:</strong>
+        Tomasulo is simulated on compiler IR to demonstrate out-of-order
+        scheduling. A classic 8051 does not implement Tomasulo hardware, so
+        the final 8051 assembly remains sequential.
+    </section>
+
+    <section class="compiler-layout">
+        <article class="panel">
+            <header class="panel-header">
+                <div class="panel-title">C++ Source</div>
+
+                <div class="toolbar">
+                    <button id="exampleButton" class="button">Example</button>
+                    <button id="clearButton" class="button">Clear</button>
+                    <button id="compileButton" class="button primary">
+                        Compile + Analyze
+                    </button>
+                </div>
+            </header>
+
+            <textarea
+                id="sourceEditor"
+                class="editor"
+                spellcheck="false"
+                aria-label="C++ source editor"
+            ></textarea>
+        </article>
+
+        <article class="panel">
+            <header class="panel-header">
+                <div class="panel-title">Compiler Inspection</div>
+
+                <div class="toolbar">
+                    <button id="copyButton" class="button">Copy ASM</button>
+                    <button id="downloadButton" class="button">
+                        Download .asm
+                    </button>
+                </div>
+            </header>
+
+            <nav class="tabs" aria-label="Compiler output views">
+                <button class="tab-button active" data-tab="assembly">
+                    Assembly
+                </button>
+                <button class="tab-button" data-tab="ir">IR</button>
+                <button class="tab-button" data-tab="schedule">Schedule</button>
+                <button class="tab-button" data-tab="dependencies">
+                    Dependencies
+                </button>
+                <button class="tab-button" data-tab="tomasulo">
+                    Tomasulo
+                </button>
+                <button class="tab-button" data-tab="ast">AST</button>
+                <button class="tab-button" data-tab="tokens">Tokens</button>
+                <button class="tab-button" data-tab="symbols">Symbols</button>
+                <button class="tab-button" data-tab="diagnostics">
+                    Diagnostics
+                </button>
+            </nav>
+
+            <section id="assemblyTab" class="tab-content active">
+                <pre id="assemblyOutput"></pre>
+            </section>
+
+            <section id="irTab" class="tab-content">
+                <pre id="irOutput"></pre>
+            </section>
+
+            <section id="scheduleTab" class="tab-content">
+                <pre id="scheduleOutput"></pre>
+            </section>
+
+            <section id="dependenciesTab" class="tab-content">
+                <pre id="dependenciesOutput"></pre>
+            </section>
+
+            <section id="tomasuloTab" class="tab-content">
+                <div class="simulator-toolbar">
+                    <button id="previousCycleButton" class="button">
+                        Previous cycle
+                    </button>
+                    <span id="cyclePosition" class="cycle-position">
+                        No simulation
+                    </span>
+                    <button id="nextCycleButton" class="button">
+                        Next cycle
+                    </button>
+                </div>
+
+                <pre id="tomasuloOutput"></pre>
+            </section>
+
+            <section id="astTab" class="tab-content">
+                <pre id="astOutput"></pre>
+            </section>
+
+            <section id="tokensTab" class="tab-content">
+                <pre id="tokensOutput"></pre>
+            </section>
+
+            <section id="symbolsTab" class="tab-content">
+                <pre id="symbolsOutput"></pre>
+            </section>
+
+            <section id="diagnosticsTab" class="tab-content">
+                <pre id="diagnosticsOutput"></pre>
+            </section>
+        </article>
+    </section>
+
+    <section class="stats">
+        <article class="stat">
+            <span id="lineCount" class="stat-value">0</span>
+            <span class="stat-label">Source lines</span>
+        </article>
+
+        <article class="stat">
+            <span id="tokenCount" class="stat-value">0</span>
+            <span class="stat-label">Tokens</span>
+        </article>
+
+        <article class="stat">
+            <span id="variableCount" class="stat-value">0</span>
+            <span class="stat-label">Variables</span>
+        </article>
+
+        <article class="stat">
+            <span id="irCount" class="stat-value">0</span>
+            <span class="stat-label">IR instructions</span>
+        </article>
+
+        <article class="stat">
+            <span id="instructionCount" class="stat-value">0</span>
+            <span class="stat-label">8051 instructions</span>
+        </article>
+
+        <article class="stat">
+            <span id="stackDepth" class="stat-value">0</span>
+            <span class="stat-label">Expression stack</span>
+        </article>
+
+        <article class="stat">
+            <span id="tomasuloCycles" class="stat-value">0</span>
+            <span class="stat-label">Analyzed OOO cycles</span>
+        </article>
+    </section>
+
+    <div id="status" class="status" aria-live="polite"></div>
+
+    <section class="docs">
+        <article class="doc-card">
+            <h2>What the Tomasulo tab means</h2>
+            <p>
+                The simulator treats compiler temporaries and local variables
+                as logical registers on a hypothetical out-of-order machine.
+                It shows reservation stations, producer tags, operand wake-up,
+                issue, execute and one-result-per-cycle common-data-bus writeback.
+            </p>
+            <p>
+                Simulation is performed one <strong>basic block</strong> at a
+                time because compile time does not know which runtime branch is
+                taken or how many times a loop iterates.
+            </p>
+        </article>
+
+        <article class="doc-card">
+            <h2>8051 target model</h2>
+            <p>
+                Variables use internal RAM <code>30H-6FH</code>.
+                The generated program initializes <code>SP=6FH</code>,
+                leaving <code>70H-7FH</code> for expression temporaries.
+            </p>
+            <p>
+                The scheduler never moves operations across labels, branches,
+                returns or writes to <code>P0-P3</code>.
+            </p>
+        </article>
+    </section>
+</main>
+
+<script type="module" src="./src/ui.js"></script>
+</body>
+</html>
